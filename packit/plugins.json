@@ -31,42 +31,6 @@
         }
       },
       "author": "@Telegram"
-    },
-    {
-      "id": "extera_custom_name_icon",
-      "name": "Custom Name & Icon",
-      "version": "1.1",
-      "author": "@AlexeiCrystal",
-      "sdk_version": ">=1.4.3.3",
-      "icon": "exteraGram/0",
-      "description": "**EN:** Allows you to set a custom name and icon for the client in the recent apps menu and on the launcher\n**RU:** Позволяет установить кастомное имя и иконку клиента в меню недавних приложений и на рабочем столе",
-      "app_version": ">=11.12.0",
-      "hash": "1c37a0729c6ddb206965754afe90aa9d5d9876b5be07ef29406035c83853759c",
-      "bithash": "bffe4b6638403922",
-      "size": "17 KB",
-      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/my-plugin.plugin",
-      "state": "release",
-      "update_date": "13.08.2026",
-      "sources": {
-        "clients": [
-          "exteraGram",
-          "AyuGram"
-        ]
-      },
-      "team": [
-        [
-          "1169951070",
-          "Developer"
-        ]
-      ],
-      "release_date": "13.08.2026",
-      "versions": {
-        "1.1": {
-          "app_version": ">=11.12.0",
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/my-plugin.plugin",
-          "size": "17 KB"
-        }
-      }
     }
   ]
 }
