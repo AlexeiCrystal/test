@@ -2,14 +2,13 @@
   "plugins": [
     {
       "id": "some_id",
-      "version": "1.0",
-      "author": "@Telegram",
-      "description": "\nSome\nDescription\n",
+      "version": "1.1",
+      "description": "Some Description",
       "app_version": ">=1.2.3",
-      "hash": "4c06ca8bdb338a781d464a5dc98ce0518dea5c1c4ed0a6e4b696199d76586d16",
-      "bithash": "b53fd62698fe788c",
-      "size": "162 B",
-      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+      "hash": "1d865876ad198b6e3f6d875b98c95b0358c510f38ecd0e5cdf8badb28557c446",
+      "bithash": "69b96008c4fdeff7",
+      "size": "141 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test-update.plugin",
       "state": "release",
       "update_date": "13.08.2026",
       "sources": {
@@ -24,8 +23,14 @@
           "app_version": ">=1.2.3",
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
           "size": "162 B"
+        },
+        "1.1": {
+          "app_version": ">=1.2.3",
+          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test-update.plugin",
+          "size": "141 B"
         }
-      }
+      },
+      "author": "@Telegram"
     }
   ]
 }
