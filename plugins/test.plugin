@@ -1,6 +1,6 @@
 __id__ = "some_id"
-__name__ "Plugin Update"
-__version__ = '1.1'
+__name__ "Plugin"
+__version__ = '1.0'
 __app_version__ = ">=1.2.3"
 __description__ = "Some Description"
 
