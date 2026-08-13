@@ -1,0 +1,11 @@
+__id__ = "some_id"
+__name__ "Plugin"
+__author__ = "@Telegram"
+__version__ = "1.0"
+__min_version__ = "1.2.3"
+__description__ = """
+Some
+Description
+"""
+
+some code
