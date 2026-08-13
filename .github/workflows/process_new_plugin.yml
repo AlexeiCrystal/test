@@ -1,4 +1,4 @@
-name: Process New Plugins
+name: Process New PackIt Plugins
 
 on:
   push:
@@ -9,46 +9,13 @@ permissions:
   contents: write
 
 jobs:
-  detect-plugins:
+  process-plugins:
     runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.set-matrix.outputs.matrix }}
-      has_files: ${{ steps.set-matrix.outputs.has_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Detect added/modified plugin files
-        id: set-matrix
-        run: |
-          FILES=$(git diff --name-only --diff-filter=AM ${{ github.event.before }} ${{ github.sha }} | grep '^plugins/.*\.plugin$' || true)
-          if [ -z "$FILES" ]; then
-            FILES=$(git show --name-only --diff-filter=AM --pretty="" ${{ github.sha }} | grep '^plugins/.*\.plugin$' || true)
-          fi
-          
-          if [ -z "$FILES" ]; then
-            echo "has_files=false" >> $GITHUB_OUTPUT
-            echo "matrix=[]" >> $GITHUB_OUTPUT
-          else
-            JSON_ARRAY=$(echo "$FILES" | jq -R . | jq -s -c .)
-            echo "has_files=true" >> $GITHUB_OUTPUT
-            echo "matrix=$JSON_ARRAY" >> $GITHUB_OUTPUT
-          fi
-
-  process-plugins:
-    needs: detect-plugins
-    if: ${{ needs.detect-plugins.outputs.has_files == 'true' }}
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      matrix:
-        file: ${{ fromJson(needs.detect-plugins.outputs.matrix) }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Python
@@ -56,10 +23,18 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Process Plugin File
+      - name: Process Plugin Files
         id: process
+        env:
+          GITHUB_BEFORE: ${{ github.event.before }}
         run: |
-          python packit/process_new_plugin.py "${{ matrix.file }}"
+          FILES=$(git diff --name-only --diff-filter=ACMRTUXD ${{ github.event.before }} ${{ github.sha }} | grep '^plugins/.*\.plugin$' || true)
+          if [ -z "$FILES" ]; then
+            FILES=$(git show --name-only --diff-filter=ACMRTUXD --pretty="" ${{ github.sha }} | grep '^plugins/.*\.plugin$' || true)
+          fi
+          if [ -n "$FILES" ]; then
+            python packit/process_new_plugin.py $FILES
+          fi
 
       - name: Commit and Push Changes
         run: |
@@ -70,6 +45,8 @@ jobs:
           if git diff --staged --quiet; then
             echo "INFO: No changes to commit in packit/plugins.json"
           else
-            git commit -m "${{ steps.process.outputs.commit_message }}"
-            git push origin main
+            if [ -f /tmp/commit_msg.txt ]; then
+              git commit -F /tmp/commit_msg.txt
+              git push origin main
+            fi
           fi
