@@ -1,6 +1,0 @@
-__id__ = "some_id"
-__name__ "Plugin"
-__version__ = '1.0'
-__app_version__ = ">=1.2.3.4"
-
-some code
