@@ -1,9 +1,10 @@
-import os
+юimport os
 import sys
 import re
 import json
 import struct
 import hashlib
+import subprocess
 from datetime import datetime
 
 P0 = 0x9E3779B97F4A7C15
@@ -11,6 +12,9 @@ P1 = 0x6C62272E07BB0142
 P2 = 0x94D049BB133111EB
 P3 = 0xBF58476D1CE4E5B9
 MASK64 = 0xFFFFFFFFFFFFFFFF
+
+OPTIONAL_KEYS = ["name", "author", "sdk_version", "icon", "description", "app_version", "team"]
+CORE_KEYS = ["id", "version", "hash", "bithash", "size", "link", "state", "update_date", "sources"]
 
 def calculate_bithash(data: bytes, seed: int = 0) -> str:
     s0 = (seed ^ P0) & MASK64
@@ -130,21 +134,7 @@ def format_size(size_bytes: int) -> str:
         val /= 1024
     return f"{size_bytes} B"
 
-def main():
-    if len(sys.argv) < 2:
-        print("ERROR: Plugin file path argument missing.")
-        sys.exit(1)
-
-    file_path = sys.argv[1]
-    print(f"INFO: Processing file: {file_path}")
-
-    if not os.path.exists(file_path):
-        print(f"ERROR: File not found: {file_path}")
-        sys.exit(1)
-
-    with open(file_path, "rb") as f:
-        binary_data = f.read()
-
+def parse_plugin_content(binary_data: bytes, file_path: str) -> dict:
     try:
         text_content = binary_data.decode("utf-8")
     except UnicodeDecodeError:
@@ -155,11 +145,10 @@ def main():
     id_match = re.search(r'__id__\s*=\s*["\']([^"\']+)["\']', text_content)
     if not id_match:
         print(f"ERROR: __id__ not found in {file_path}")
-        sys.exit(1)
-    
+        return None
+
     plugin_id = id_match.group(1)
     temp_dict["id"] = plugin_id
-    print(f'INFO: Extracted plugin id "{plugin_id}"')
 
     for key, regex in [
         ("name", r'__name__\s*=\s*["\']([^"\']+)["\']'),
@@ -171,37 +160,28 @@ def main():
         match = re.search(regex, text_content)
         if match:
             temp_dict[key] = match.group(1)
-            print(f'INFO: Extracted {key}: "{match.group(1)}"')
 
     desc_match = re.search(r'__description__\s*=\s*(?:"""(.*?)"""|\'\'\'(.*?)\'\'\'|["\']([^"\']+)["\'])', text_content, re.DOTALL)
     if desc_match:
         desc_val = next(g for g in desc_match.groups() if g is not None)
         temp_dict["description"] = desc_val
-        print("INFO: Extracted description")
-    else:
-        print("WARN: Plugin description not found")
 
     min_ver_match = re.search(r'__min_version__\s*=\s*["\']([^"\']+)["\']', text_content)
     app_ver_match = re.search(r'__app_version__\s*=\s*["\']([^"\']+)["\']', text_content)
 
     if app_ver_match:
         temp_dict["app_version"] = app_ver_match.group(1)
-        print(f'INFO: Extracted app_version: "{app_ver_match.group(1)}"')
     elif min_ver_match:
         temp_dict["app_version"] = f">={min_ver_match.group(1)}"
-        print(f'INFO: Extracted app_version from min_version: ">={min_ver_match.group(1)}"')
 
     sha256_hash = hashlib.sha256(binary_data).hexdigest()
     temp_dict["hash"] = sha256_hash
-    print(f"INFO: Calculated SHA256: {sha256_hash}")
 
     bithash_val = calculate_bithash(binary_data)
     temp_dict["bithash"] = bithash_val
-    print(f"INFO: Calculated BitHash: {bithash_val}")
 
     file_size_str = format_size(len(binary_data))
     temp_dict["size"] = file_size_str
-    print(f"INFO: Calculated size: {file_size_str}")
 
     filename = os.path.basename(file_path)
     temp_dict["link"] = f"https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/{filename}"
@@ -213,7 +193,6 @@ def main():
         temp_dict["state"] = "alpha"
     else:
         temp_dict["state"] = "release"
-    print(f'INFO: Set state: {temp_dict["state"]}')
 
     current_date = datetime.now().strftime("%d.%m.%Y")
     temp_dict["update_date"] = current_date
@@ -233,6 +212,54 @@ def main():
             ]
         ]
 
+    return temp_dict
+
+def parse_plugin_file(file_path: str) -> dict:
+    if not os.path.exists(file_path):
+        return None
+    with open(file_path, "rb") as f:
+        binary_data = f.read()
+    return parse_plugin_content(binary_data, file_path)
+
+def get_deleted_file_content(file_path: str) -> bytes:
+    refs = []
+    if "GITHUB_BEFORE" in os.environ and os.environ["GITHUB_BEFORE"]:
+        refs.append(os.environ["GITHUB_BEFORE"])
+    refs.extend(["HEAD~1", "HEAD^", "HEAD"])
+
+    for ref in refs:
+        try:
+            res = subprocess.run(
+                ["git", "show", f"{ref}:{file_path}"],
+                capture_output=True,
+                check=True
+            )
+            if res.stdout:
+                return res.stdout
+        except Exception:
+            continue
+    return None
+
+def update_top_level_metadata(plugin_obj: dict, source_dict: dict):
+    for key in CORE_KEYS:
+        if key in source_dict:
+            plugin_obj[key] = source_dict[key]
+        elif key in plugin_obj:
+            del plugin_obj[key]
+
+    for key in OPTIONAL_KEYS:
+        if key in source_dict:
+            plugin_obj[key] = source_dict[key]
+        elif key in plugin_obj:
+            del plugin_obj[key]
+
+def main():
+    if len(sys.argv) < 2:
+        print("ERROR: Plugin file arguments missing.")
+        sys.exit(1)
+
+    file_paths = sys.argv[1:]
+
     json_path = os.path.join("packit", "plugins.json")
     plugins_data = {"plugins": []}
 
@@ -244,67 +271,174 @@ def main():
             print(f"WARN: Failed to read {json_path}: {e}. Creating new structure.")
 
     plugins_list = plugins_data.get("plugins", [])
-    
-    exists = False
-    index = -1
-    for i, plugin in enumerate(plugins_list):
-        if plugin.get("id") == plugin_id:
-            exists = True
-            index = i
-            break
 
-    if exists:
-        print(f'INFO: Plugin "{plugin_id}" found in main dictionary. Updating...')
-        main_plugin = plugins_list[index]
-        
-        temp_dict["release_date"] = main_plugin.get("release_date", temp_dict["update_date"])
+    added_ids = []
+    updated_ids = []
+    deleted_ids = []
 
-        if "versions" in main_plugin and isinstance(main_plugin["versions"], dict):
-            temp_dict["versions"] = main_plugin["versions"].copy()
+    for file_path in file_paths:
+        print(f"INFO: Processing file: {file_path}")
+
+        if not os.path.exists(file_path):
+            binary_data = get_deleted_file_content(file_path)
+            del_dict = parse_plugin_content(binary_data, file_path) if binary_data else None
+
+            target_plugin = None
+            target_index = -1
+            del_ver = None
+            del_id = None
+
+            if del_dict:
+                del_id = del_dict.get("id")
+                del_ver = del_dict.get("version")
+                for i, plugin in enumerate(plugins_list):
+                    if plugin.get("id") == del_id:
+                        target_plugin = plugin
+                        target_index = i
+                        break
+
+            if not target_plugin:
+                filename = os.path.basename(file_path)
+                for i, plugin in enumerate(plugins_list):
+                    if os.path.basename(plugin.get("link", "")) == filename:
+                        target_plugin = plugin
+                        target_index = i
+                        del_id = plugin.get("id")
+                        del_ver = plugin.get("version")
+                        break
+                    versions = plugin.get("versions", {})
+                    if isinstance(versions, dict):
+                        for v, v_data in versions.items():
+                            if isinstance(v_data, dict) and os.path.basename(v_data.get("link", "")) == filename:
+                                target_plugin = plugin
+                                target_index = i
+                                del_id = plugin.get("id")
+                                del_ver = v
+                                break
+                        if target_plugin:
+                            break
+
+            if not target_plugin:
+                print(f"WARN: File {file_path} deleted, but not found in plugins.json")
+                continue
+
+            top_ver = target_plugin.get("version")
+            versions = target_plugin.get("versions", {})
+
+            if del_ver and isinstance(versions, dict) and del_ver in versions:
+                del versions[del_ver]
+
+            if del_ver == top_ver:
+                if not versions:
+                    plugins_list.pop(target_index)
+                    if del_id in added_ids:
+                        added_ids.remove(del_id)
+                    if del_id in updated_ids:
+                        updated_ids.remove(del_id)
+                    if del_id not in deleted_ids:
+                        deleted_ids.append(del_id)
+                else:
+                    prev_ver = list(versions.keys())[-1]
+                    prev_entry = versions[prev_ver]
+                    prev_filename = os.path.basename(prev_entry.get("link", ""))
+                    prev_file_path = os.path.join(os.path.dirname(file_path) or "plugins", prev_filename)
+
+                    prev_temp = None
+                    if os.path.exists(prev_file_path):
+                        prev_temp = parse_plugin_file(prev_file_path)
+
+                    if prev_temp:
+                        update_top_level_metadata(target_plugin, prev_temp)
+                    else:
+                        target_plugin["version"] = prev_ver
+                        target_plugin["link"] = prev_entry.get("link", "")
+                        target_plugin["size"] = prev_entry.get("size", "")
+                        if "app_version" in prev_entry:
+                            target_plugin["app_version"] = prev_entry["app_version"]
+                        elif "app_version" in target_plugin:
+                            del target_plugin["app_version"]
+
+                    if del_id not in updated_ids and del_id not in deleted_ids:
+                        updated_ids.append(del_id)
+            else:
+                if del_id not in updated_ids and del_id not in deleted_ids:
+                    updated_ids.append(del_id)
+
         else:
-            temp_dict["versions"] = {}
+            temp_dict = parse_plugin_file(file_path)
+            if not temp_dict:
+                continue
 
-        old_ver = main_plugin.get("version")
-        if old_ver and old_ver not in temp_dict["versions"]:
-            ver_entry = {}
-            for k in ["app_version", "changelog", "link", "size"]:
-                if k in main_plugin:
-                    ver_entry[k] = main_plugin[k]
-            temp_dict["versions"][old_ver] = ver_entry
+            plugin_id = temp_dict["id"]
+            curr_ver = temp_dict.get("version")
 
-        curr_ver = temp_dict.get("version")
-        if curr_ver:
-            curr_entry = {}
-            if "app_version" in temp_dict:
-                curr_entry["app_version"] = temp_dict["app_version"]
-            curr_entry["link"] = temp_dict["link"]
-            curr_entry["size"] = temp_dict["size"]
-            
-            temp_dict["versions"][curr_ver] = curr_entry
+            exists = False
+            index = -1
+            for i, plugin in enumerate(plugins_list):
+                if plugin.get("id") == plugin_id:
+                    exists = True
+                    index = i
+                    break
 
-        for k, v in main_plugin.items():
-            if k not in temp_dict:
-                temp_dict[k] = v
+            if not exists:
+                temp_dict["release_date"] = temp_dict["update_date"]
+                temp_dict["versions"] = {}
+                if curr_ver:
+                    curr_entry = {
+                        "link": temp_dict["link"],
+                        "size": temp_dict["size"]
+                    }
+                    if "app_version" in temp_dict:
+                        curr_entry["app_version"] = temp_dict["app_version"]
+                    temp_dict["versions"][curr_ver] = curr_entry
+                plugins_list.append(temp_dict)
+                if plugin_id not in added_ids:
+                    added_ids.append(plugin_id)
+            else:
+                main_plugin = plugins_list[index]
+                old_ver = main_plugin.get("version")
+                if "versions" not in main_plugin or not isinstance(main_plugin["versions"], dict):
+                    main_plugin["versions"] = {}
 
-        plugins_list[index] = temp_dict
-        commit_msg = f'Update plugin "{plugin_id}" in packit/plugins.json'
-    else:
-        print(f'INFO: Plugin "{plugin_id}" not found in main dictionary. Adding...')
-        temp_dict["release_date"] = temp_dict["update_date"]
-        temp_dict["versions"] = {}
+                if curr_ver == old_ver:
+                    update_top_level_metadata(main_plugin, temp_dict)
+                    curr_entry = {
+                        "link": temp_dict["link"],
+                        "size": temp_dict["size"]
+                    }
+                    if "app_version" in temp_dict:
+                        curr_entry["app_version"] = temp_dict["app_version"]
+                    main_plugin["versions"][curr_ver] = curr_entry
 
-        curr_ver = temp_dict.get("version")
-        if curr_ver:
-            curr_entry = {}
-            if "app_version" in temp_dict:
-                curr_entry["app_version"] = temp_dict["app_version"]
-            curr_entry["link"] = temp_dict["link"]
-            curr_entry["size"] = temp_dict["size"]
-            
-            temp_dict["versions"][curr_ver] = curr_entry
+                elif curr_ver in main_plugin["versions"]:
+                    curr_entry = main_plugin["versions"][curr_ver]
+                    curr_entry["link"] = temp_dict["link"]
+                    curr_entry["size"] = temp_dict["size"]
+                    if "app_version" in temp_dict:
+                        curr_entry["app_version"] = temp_dict["app_version"]
+                    elif "app_version" in curr_entry:
+                        del curr_entry["app_version"]
 
-        plugins_list.append(temp_dict)
-        commit_msg = f'Add plugin "{plugin_id}" to packit/plugins.json'
+                else:
+                    if old_ver and old_ver not in main_plugin["versions"]:
+                        ver_entry = {}
+                        for k in ["app_version", "changelog", "link", "size"]:
+                            if k in main_plugin:
+                                ver_entry[k] = main_plugin[k]
+                        main_plugin["versions"][old_ver] = ver_entry
+
+                    update_top_level_metadata(main_plugin, temp_dict)
+
+                    curr_entry = {
+                        "link": temp_dict["link"],
+                        "size": temp_dict["size"]
+                    }
+                    if "app_version" in temp_dict:
+                        curr_entry["app_version"] = temp_dict["app_version"]
+                    main_plugin["versions"][curr_ver] = curr_entry
+
+                if plugin_id not in updated_ids and plugin_id not in added_ids:
+                    updated_ids.append(plugin_id)
 
     plugins_data["plugins"] = plugins_list
 
@@ -314,11 +448,38 @@ def main():
 
     print(f"INFO: Successfully saved {json_path}")
 
-    github_output = os.getenv('GITHUB_OUTPUT')
-    if github_output:
-        with open(github_output, 'a', encoding='utf-8') as f:
-            f.write(f"commit_message={commit_msg}\n")
-            f.write(f"plugin_id={plugin_id}\n")
+    title_parts = []
+    body_parts = []
+
+    if added_ids:
+        if len(added_ids) == 1:
+            title_parts.append(f"Added {added_ids[0]} plugin")
+        else:
+            title_parts.append(f"Added {len(added_ids)} plugins")
+            body_parts.append(f"Added: {', '.join(added_ids)}")
+
+    if updated_ids:
+        if len(updated_ids) == 1:
+            title_parts.append(f"Updated {updated_ids[0]} plugin")
+        else:
+            title_parts.append(f"Updated {len(updated_ids)} plugins")
+            body_parts.append(f"Updated: {', '.join(updated_ids)}")
+
+    if deleted_ids:
+        if len(deleted_ids) == 1:
+            title_parts.append(f"Deleted {deleted_ids[0]} plugin")
+        else:
+            title_parts.append(f"Deleted {len(deleted_ids)} plugins")
+            body_parts.append(f"Deleted: {', '.join(deleted_ids)}")
+
+    if title_parts:
+        commit_title = ", ".join(title_parts) + f" in {json_path}"
+        commit_body = "\n".join(body_parts)
+
+        with open("/tmp/commit_msg.txt", "w", encoding="utf-8") as f:
+            f.write(commit_title)
+            if commit_body:
+                f.write("\n\n" + commit_body)
 
 if __name__ == "__main__":
     main()
