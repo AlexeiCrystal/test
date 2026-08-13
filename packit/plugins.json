@@ -19,11 +19,6 @@
       },
       "release_date": "13.08.2026",
       "versions": {
-        "1.0": {
-          "app_version": ">=1.2.3",
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
-          "size": "162 B"
-        },
         "1.1": {
           "app_version": ">=1.2.3",
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test-update.plugin",
