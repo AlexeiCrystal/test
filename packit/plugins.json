@@ -1,0 +1,31 @@
+{
+  "plugins": [
+    {
+      "id": "some_id",
+      "version": "1.0",
+      "author": "@Telegram",
+      "description": "\nSome\nDescription\n",
+      "app_version": ">=1.2.3",
+      "hash": "4c06ca8bdb338a781d464a5dc98ce0518dea5c1c4ed0a6e4b696199d76586d16",
+      "bithash": "b53fd62698fe788c",
+      "size": "162 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+      "state": "release",
+      "update_date": "13.08.2026",
+      "sources": {
+        "clients": [
+          "exteraGram",
+          "AyuGram"
+        ]
+      },
+      "release_date": "13.08.2026",
+      "versions": {
+        "1.0": {
+          "app_version": ">=1.2.3",
+          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+          "size": "162 B"
+        }
+      }
+    }
+  ]
+}
