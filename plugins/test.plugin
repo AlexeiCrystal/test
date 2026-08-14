@@ -1,7 +1,7 @@
 __id__ = "some_id"
 __name__ "My Plugin"
 __version__ = '1.0'
-__app_version__ = ">=1.2.3.4"
+__app_version__ = ">=1.2.3.69"
 __description__ = "Some Description 123"
 
-some code2
+some code2333333
