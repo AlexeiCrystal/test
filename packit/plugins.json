@@ -103,20 +103,10 @@
       "update_date": "14.08.2026",
       "release_date": "14.08.2026",
       "versions": {
-        "1.0": {
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/1.plugin",
-          "size": "170 B",
-          "app_version": ">=1.2.3.5.67"
-        },
         "1.1": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/2.plugin",
           "size": "173 B",
-          "app_version": ">=1.2.3.5.678",
-          "changelog": [
-            "None",
-            "+2",
-            "-1"
-          ]
+          "app_version": ">=1.2.3.5.678"
         },
         "1.2": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/3.plugin",
