@@ -2,7 +2,8 @@ __id__ = "test_diff"
 __name__ = "Plugin Update2"
 __version__ = '1.4'
 __app_version__ = ">=1.2.3.5.678"
-__description__ = "Some Description 4567"
+
+__icon__ = "test/1"
 
 some code123456789010101010
 aahha
