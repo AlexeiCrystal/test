@@ -1,3 +1,31 @@
 {
-  "plugins": []
+  "plugins": [
+    {
+      "id": "some_id",
+      "name": "Plugin Update 2 BETA",
+      "version": "1.0",
+      "description": "Some Description 456",
+      "app_version": ">=1.2.3.5.67",
+      "hash": "5733a44035041713466918cb767943d32dd652bda49b3aafb8c63abb2735e1a4",
+      "bithash": "e22557fbccbabe43",
+      "size": "164 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+      "state": "release",
+      "update_date": "14.08.2026",
+      "sources": {
+        "clients": [
+          "exteraGram",
+          "AyuGram"
+        ]
+      },
+      "release_date": "14.08.2026",
+      "versions": {
+        "1.0": {
+          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+          "size": "164 B",
+          "app_version": ">=1.2.3.5.67"
+        }
+      }
+    }
+  ]
 }
