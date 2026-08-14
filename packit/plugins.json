@@ -2,15 +2,15 @@
   "plugins": [
     {
       "id": "some_id",
-      "name": "Plugin Update 2 BETA",
+      "name": "Plugin Update 2",
       "version": "1.0",
       "description": "Some Description 456",
       "app_version": ">=1.2.3.5.67",
-      "hash": "d34f3246723ec7e2cf7d4da3faa32b363211f0c74b20729d5be21153105f8be2",
-      "bithash": "41633486529cb5ff",
-      "size": "175 B",
+      "hash": "41d5135b4b43c4911f98303e1b4f5d581283eea3b0dfcde1aa8b5d099c7fd167",
+      "bithash": "8dfe2c4d41675343",
+      "size": "170 B",
       "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
-      "state": "beta",
+      "state": "release",
       "update_date": "14.08.2026",
       "sources": {
         "clients": [
@@ -21,7 +21,7 @@
       "versions": {
         "1.0": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
-          "size": "175 B",
+          "size": "170 B",
           "app_version": ">=1.2.3.5.67"
         }
       },
