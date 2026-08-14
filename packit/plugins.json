@@ -18,13 +18,7 @@
         ]
       },
       "release_date": "14.08.2026",
-      "versions": {
-        "1.0": {
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
-          "size": "170 B",
-          "app_version": ">=1.2.3.5.67"
-        }
-      },
+      "versions": {},
       "team": [
         [
           "1169951070",
@@ -49,11 +43,6 @@
         "1.0": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test2.plugin",
           "size": "190 B",
-          "app_version": ">=1.2.3.5.67"
-        },
-        "1.1": {
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test3.plugin",
-          "size": "196 B",
           "app_version": ">=1.2.3.5.67"
         }
       },
@@ -82,13 +71,7 @@
       "state": "release",
       "update_date": "14.08.2026",
       "release_date": "14.08.2026",
-      "versions": {
-        "1.0": {
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test4.plugin",
-          "size": "220 B",
-          "app_version": ">=1.2.3.5.67"
-        }
-      },
+      "versions": {},
       "sources": {
         "clients": [
           "exteraGram",
@@ -105,6 +88,30 @@
           "Developer"
         ]
       ]
+    },
+    {
+      "id": "test_diff",
+      "name": "Plugin Update",
+      "version": "1.0",
+      "description": "Some Description 456",
+      "app_version": ">=1.2.3.5.67",
+      "hash": "fbc70bcc678bef0cc564689284559883fcee3db35a6581f488007325a60ec553",
+      "bithash": "e8911283899f79b8",
+      "size": "170 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/1.plugin",
+      "state": "release",
+      "update_date": "14.08.2026",
+      "release_date": "14.08.2026",
+      "versions": {},
+      "sources": {
+        "clients": [
+          "exteraGram",
+          "AyuGram"
+        ],
+        "langs": [
+          "Python"
+        ]
+      }
     }
   ]
 }
