@@ -1,7 +1,0 @@
-__id__ = "test_diff"
-__name__ = "Plugin Update"
-__version__ = '1.0'
-__app_version__ = ">=1.2.3.5.67"
-__description__ = "Some Description 456"
-
-some code123456789010101010
