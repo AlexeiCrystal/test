@@ -93,11 +93,10 @@
       "id": "test_diff",
       "name": "Plugin Update2",
       "version": "1.4",
-      "description": "Some Description 4567",
       "app_version": ">=1.2.3.5.678",
-      "hash": "51fe1d6f32a49fc792a4800b535c468171dab68d2460d0782e3fb2b42751f06e",
-      "bithash": "8093a1ee0c459794",
-      "size": "225 B",
+      "hash": "aa264a490140442ea7aaee5fc185db7a1dba72f0186f91d38b0d3598c36ceb7e",
+      "bithash": "d038e72fa1524fc9",
+      "size": "204 B",
       "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/4.plugin",
       "state": "release",
       "update_date": "14.08.2026",
@@ -130,10 +129,11 @@
       },
       "changelog": [
         "67",
-        "+9",
-        "-1"
+        "+11",
+        "-2"
       ],
-      "testfield": "123"
+      "testfield": "123",
+      "icon": "test/1"
     }
   ]
 }
