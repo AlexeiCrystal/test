@@ -13,8 +13,8 @@ P2 = 0x94D049BB133111EB
 P3 = 0xBF58476D1CE4E5B9
 MASK64 = 0xFFFFFFFFFFFFFFFF
 
-OPTIONAL_KEYS = ["name", "author", "sdk_version", "icon", "description", "app_version", "team"]
-CORE_KEYS = ["id", "version", "hash", "bithash", "size", "link", "state", "update_date", "sources"]
+PURGEABLE_META_KEYS = ["name", "icon", "version", "author", "description", "app_version", "sdk_version"]
+ALWAYS_UPDATE_KEYS = ["id", "hash", "bithash", "size", "link", "state", "update_date", "sources"]
 
 def calculate_bithash(data: bytes, seed: int = 0) -> str:
     s0 = (seed ^ P0) & MASK64
@@ -186,7 +186,7 @@ def parse_plugin_content(binary_data: bytes, file_path: str) -> dict:
     filename = os.path.basename(file_path)
     temp_dict["link"] = f"https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/{filename}"
 
-    check_str = f"{filename} {temp_dict.get('version', '')}".lower()
+    check_str = f"{filename} {temp_dict.get('name', '')} {temp_dict.get('version', '')}".lower()
     if "beta" in check_str or "бета" in check_str:
         temp_dict["state"] = "beta"
     elif "alpha" in check_str or "альфа" in check_str:
@@ -241,13 +241,11 @@ def get_deleted_file_content(file_path: str) -> bytes:
     return None
 
 def update_top_level_metadata(plugin_obj: dict, source_dict: dict):
-    for key in CORE_KEYS:
+    for key in ALWAYS_UPDATE_KEYS:
         if key in source_dict:
             plugin_obj[key] = source_dict[key]
-        elif key in plugin_obj:
-            del plugin_obj[key]
 
-    for key in OPTIONAL_KEYS:
+    for key in PURGEABLE_META_KEYS:
         if key in source_dict:
             plugin_obj[key] = source_dict[key]
         elif key in plugin_obj:
