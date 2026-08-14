@@ -1,0 +1,10 @@
+__id__ = "some_id3"
+__name__ = "Plugin 123"
+__version__ = '1.0'
+__app_version__ = ">=1.2.3.5.67"
+__description__ = "Some Description 456"
+__author__ = "@AlexeiCrystal"
+
+some code123456789010101010
+
+InMemoryDexClassLoader
