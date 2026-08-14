@@ -1,7 +1,0 @@
-__id__ = "some_id"
-__name__ "Plugin Update [BETA]"
-__version__ = '1.1'
-__app_version__ = ">=1.2.3.5"
-__description__ = "Some Description 456"
-
-some code123a
