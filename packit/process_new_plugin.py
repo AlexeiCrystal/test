@@ -16,6 +16,10 @@ MASK64 = 0xFFFFFFFFFFFFFFFF
 PURGEABLE_META_KEYS = ["name", "icon", "version", "author", "description", "app_version", "sdk_version"]
 ALWAYS_UPDATE_KEYS = ["id", "hash", "bithash", "size", "link", "state", "update_date"]
 
+know_authors = {
+    "@AlexeiCrystal": "1169951070"
+}
+
 def calculate_bithash(data: bytes, seed: int = 0) -> str:
     s0 = (seed ^ P0) & MASK64
     s1 = (seed ^ P1) & MASK64
@@ -141,6 +145,7 @@ def parse_plugin_content(binary_data: bytes, file_path: str) -> dict:
         text_content = binary_data.decode("latin-1")
 
     temp_dict = {}
+    temp_dict["has_dex"] = "DexClassLoader" in text_content
 
     id_match = re.search(r'__id__\s*=\s*["\']([^"\']+)["\']', text_content)
     if not id_match:
@@ -364,6 +369,7 @@ def main():
                     break
 
             if not exists:
+                has_dex = temp_dict.pop("has_dex", False)
                 temp_dict["release_date"] = temp_dict["update_date"]
                 temp_dict["versions"] = {}
                 if curr_ver:
@@ -379,13 +385,15 @@ def main():
                     "clients": [
                         "exteraGram",
                         "AyuGram"
-                    ]
+                    ],
+                    "langs": ["Python", "Java"] if has_dex else ["Python"]
                 }
 
-                if temp_dict.get("author") == "@AlexeiCrystal":
+                author = temp_dict.get("author")
+                if author in know_authors:
                     temp_dict["team"] = [
                         [
-                            "1169951070",
+                            know_authors[author],
                             "Developer"
                         ]
                     ]
@@ -393,6 +401,7 @@ def main():
                 if plugin_id not in added_ids:
                     added_ids.append(plugin_id)
             else:
+                temp_dict.pop("has_dex", None)
                 main_plugin = plugins_list[index]
                 old_ver = main_plugin.get("version")
                 if "versions" not in main_plugin or not isinstance(main_plugin["versions"], dict):
