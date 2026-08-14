@@ -95,9 +95,9 @@
       "version": "1.4",
       "description": "Some Description 4567",
       "app_version": ">=1.2.3.5.678",
-      "hash": "35b0414831d18f0c1e80e1c5ad09ddb7d23f1487f1cfa7ec8d82b83336c9c09c",
-      "bithash": "c3af1fda54416c7b",
-      "size": "199 B",
+      "hash": "51fe1d6f32a49fc792a4800b535c468171dab68d2460d0782e3fb2b42751f06e",
+      "bithash": "8093a1ee0c459794",
+      "size": "225 B",
       "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/4.plugin",
       "state": "release",
       "update_date": "14.08.2026",
@@ -130,7 +130,7 @@
       },
       "changelog": [
         "None",
-        "+5",
+        "+9",
         "-1"
       ]
     }
