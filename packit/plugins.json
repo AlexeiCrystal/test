@@ -5,9 +5,9 @@
       "version": "1.1",
       "description": "Some Description 456",
       "app_version": ">=1.2.3.5",
-      "hash": "f9a650987e7675a76cef37664b94c896b1a61ceca5887187d729be939ebd7af8",
-      "bithash": "e458fc390b476232",
-      "size": "148 B",
+      "hash": "2e428697d596cb3f57bacb3098e655bac8f174d69a090f9e3101872ca8fc520c",
+      "bithash": "df2920b59e4ab698",
+      "size": "170 B",
       "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test2.plugin",
       "state": "release",
       "update_date": "14.08.2026",
@@ -26,10 +26,11 @@
         },
         "1.1": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test2.plugin",
-          "size": "148 B",
+          "size": "170 B",
           "app_version": ">=1.2.3.5"
         }
-      }
+      },
+      "icon": "test/123"
     }
   ]
 }
