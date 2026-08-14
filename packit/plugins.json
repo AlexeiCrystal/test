@@ -109,11 +109,11 @@
         },
         "1.2": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/3.plugin",
-          "size": "179 B",
+          "size": "221 B",
           "app_version": ">=1.2.3.5.678",
           "changelog": [
             "Ahahhah",
-            "+2",
+            "+23",
             "-1"
           ]
         }
@@ -130,7 +130,7 @@
       "changelog": [
         "67",
         "+11",
-        "-2"
+        "-23"
       ],
       "testfield": "123",
       "icon": "test/1"
