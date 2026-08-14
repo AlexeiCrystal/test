@@ -21,8 +21,8 @@
       "versions": {
         "1.0": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
-          "size": "149 B",
-          "app_version": ">=1.2.3.5"
+          "size": "144 B",
+          "app_version": ">=1.2.3"
         },
         "1.1": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test2.plugin",
