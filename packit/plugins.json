@@ -67,6 +67,44 @@
           "123"
         ]
       }
+    },
+    {
+      "id": "some_id3",
+      "name": "Plugin 123",
+      "version": "1.0",
+      "author": "@AlexeiCrystal",
+      "description": "Some Description 456",
+      "app_version": ">=1.2.3.5.67",
+      "hash": "fe1ba804ac935f799c0fe3ec3bd4ad16dfe42f681a087d144cbdf9f63153bcaf",
+      "bithash": "cfe76640b2c09b78",
+      "size": "220 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test4.plugin",
+      "state": "release",
+      "update_date": "14.08.2026",
+      "release_date": "14.08.2026",
+      "versions": {
+        "1.0": {
+          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test4.plugin",
+          "size": "220 B",
+          "app_version": ">=1.2.3.5.67"
+        }
+      },
+      "sources": {
+        "clients": [
+          "exteraGram",
+          "AyuGram"
+        ],
+        "langs": [
+          "Python",
+          "Java"
+        ]
+      },
+      "team": [
+        [
+          "1169951070",
+          "Developer"
+        ]
+      ]
     }
   ]
 }
