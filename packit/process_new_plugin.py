@@ -14,7 +14,7 @@ P3 = 0xBF58476D1CE4E5B9
 MASK64 = 0xFFFFFFFFFFFFFFFF
 
 PURGEABLE_META_KEYS = ["name", "icon", "version", "author", "description", "app_version", "sdk_version"]
-ALWAYS_UPDATE_KEYS = ["id", "hash", "bithash", "size", "link", "state", "update_date", "sources"]
+ALWAYS_UPDATE_KEYS = ["id", "hash", "bithash", "size", "link", "state", "update_date"]
 
 def calculate_bithash(data: bytes, seed: int = 0) -> str:
     s0 = (seed ^ P0) & MASK64
@@ -197,13 +197,6 @@ def parse_plugin_content(binary_data: bytes, file_path: str) -> dict:
     current_date = datetime.now().strftime("%d.%m.%Y")
     temp_dict["update_date"] = current_date
 
-    temp_dict["sources"] = {
-        "clients": [
-            "exteraGram",
-            "AyuGram"
-        ]
-    }
-
     return temp_dict
 
 def parse_plugin_file(file_path: str) -> dict:
@@ -381,6 +374,14 @@ def main():
                     if "app_version" in temp_dict:
                         curr_entry["app_version"] = temp_dict["app_version"]
                     temp_dict["versions"][curr_ver] = curr_entry
+
+                temp_dict["sources"] = {
+                    "clients": [
+                        "exteraGram",
+                        "AyuGram"
+                    ]
+                }
+
                 if temp_dict.get("author") == "@AlexeiCrystal":
                     temp_dict["team"] = [
                         [
