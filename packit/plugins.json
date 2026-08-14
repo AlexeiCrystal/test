@@ -2,13 +2,13 @@
   "plugins": [
     {
       "id": "some_id",
-      "version": "1.0",
-      "description": "Some Description 123",
-      "app_version": ">=1.2.3.4",
-      "hash": "069ec1c8c0b2ea50829aae7110be8a8e4b387c85490f0820f0e2e05eeabe2d85",
-      "bithash": "f12bf0a88afde2f9",
-      "size": "143 B",
-      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+      "version": "1.1",
+      "description": "Some Description 456",
+      "app_version": ">=1.2.3.5",
+      "hash": "f9a650987e7675a76cef37664b94c896b1a61ceca5887187d729be939ebd7af8",
+      "bithash": "e458fc390b476232",
+      "size": "148 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test2.plugin",
       "state": "release",
       "update_date": "14.08.2026",
       "sources": {
@@ -23,6 +23,11 @@
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
           "size": "143 B",
           "app_version": ">=1.2.3.4"
+        },
+        "1.1": {
+          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test2.plugin",
+          "size": "148 B",
+          "app_version": ">=1.2.3.5"
         }
       }
     }
