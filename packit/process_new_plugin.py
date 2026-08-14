@@ -6,6 +6,8 @@ import struct
 import hashlib
 import subprocess
 from datetime import datetime
+import difflib
+import urllib.request
 
 P0 = 0x9E3779B97F4A7C15
 P1 = 0x6C62272E07BB0142
@@ -17,7 +19,17 @@ PURGEABLE_META_KEYS = ["name", "icon", "version", "author", "description", "app_
 ALWAYS_UPDATE_KEYS = ["id", "hash", "bithash", "size", "link", "state", "update_date"]
 
 know_authors = {
-    "@AlexeiCrystal": "1169951070"
+    "@AlexeiCrystal": "1169951070",
+    "@PESSDES_Plugins": "6914257655",
+    "@YouRooni": "855890735",
+    "@RnPlugins": "855890735",
+    "@nonPlugins": "3551573748",
+    "@itskotovski": "75671920",
+    "@mihailkotovski & @mishabotov": "75671920",
+    "@shareui": "400216230",
+    "@shareui(@doctashare)": "400216230",
+    "@itNotMax - @MaxExteraPlugins": "929185014",
+    "@itNotMax": "929185014"
 }
 
 def calculate_bithash(data: bytes, seed: int = 0) -> str:
@@ -209,7 +221,13 @@ def parse_plugin_file(file_path: str) -> dict:
         return None
     with open(file_path, "rb") as f:
         binary_data = f.read()
-    return parse_plugin_content(binary_data, file_path)
+    res = parse_plugin_content(binary_data, file_path)
+    if res:
+        try:
+            res["_raw_text"] = binary_data.decode("utf-8")
+        except UnicodeDecodeError:
+            res["_raw_text"] = binary_data.decode("latin-1")
+    return res
 
 def get_deleted_file_content(file_path: str) -> bytes:
     refs = []
@@ -229,6 +247,61 @@ def get_deleted_file_content(file_path: str) -> bytes:
         except Exception:
             continue
     return None
+
+def fetch_bytes_for_link(link: str) -> bytes:
+    if not link:
+        return None
+    basename = os.path.basename(link)
+    local_path = os.path.join("plugins", basename)
+
+    if os.path.exists(local_path):
+        with open(local_path, "rb") as f:
+            return f.read()
+
+    b = get_deleted_file_content(local_path)
+    if b:
+        return b
+
+    try:
+        with urllib.request.urlopen(link) as resp:
+            return resp.read()
+    except Exception:
+        return None
+
+def get_plugin_text(link: str) -> str:
+    b = fetch_bytes_for_link(link)
+    if b:
+        try:
+            return b.decode("utf-8")
+        except UnicodeDecodeError:
+            return b.decode("latin-1")
+    return ""
+
+def calculate_diff(old_text: str, new_text: str):
+    old_lines = old_text.splitlines()
+    new_lines = new_text.splitlines()
+    diff = difflib.ndiff(old_lines, new_lines)
+    added = 0
+    removed = 0
+    for line in diff:
+        if line.startswith('+ '):
+            added += 1
+        elif line.startswith('- '):
+            removed += 1
+    return added, removed
+
+def update_changelog(target_dict: dict, old_text: str, new_text: str, reset_link: bool = False):
+    added, removed = calculate_diff(old_text, new_text)
+    if "changelog" not in target_dict or not isinstance(target_dict["changelog"], list) or len(target_dict["changelog"]) == 0:
+        target_dict["changelog"] = ["None", f"+{added}", f"-{removed}"]
+    else:
+        cl = target_dict["changelog"]
+        while len(cl) < 3:
+            cl.append("")
+        if reset_link:
+            cl[0] = "None"
+        cl[1] = f"+{added}"
+        cl[2] = f"-{removed}"
 
 def update_top_level_metadata(plugin_obj: dict, source_dict: dict):
     for key in ALWAYS_UPDATE_KEYS:
@@ -255,6 +328,10 @@ def main():
         try:
             with open(json_path, "r", encoding="utf-8") as f:
                 plugins_data = json.load(f)
+                for p in plugins_data.get("plugins", []):
+                    v = p.get("version")
+                    if v and "versions" in p and v in p["versions"]:
+                        del p["versions"][v]
         except Exception as e:
             print(f"WARN: Failed to read {json_path}: {e}. Creating new structure.")
 
@@ -313,9 +390,6 @@ def main():
             top_ver = target_plugin.get("version")
             versions = target_plugin.get("versions", {})
 
-            if del_ver and isinstance(versions, dict) and del_ver in versions:
-                del versions[del_ver]
-
             if del_ver == top_ver:
                 if not versions:
                     plugins_list.pop(target_index)
@@ -327,28 +401,55 @@ def main():
                         deleted_ids.append(del_id)
                 else:
                     prev_ver = list(versions.keys())[-1]
-                    prev_entry = versions[prev_ver]
-                    prev_filename = os.path.basename(prev_entry.get("link", ""))
-                    prev_file_path = os.path.join(os.path.dirname(file_path) or "plugins", prev_filename)
+                    prev_entry = versions.pop(prev_ver)
+                    
+                    prev_link = prev_entry.get("link", "")
+                    b = fetch_bytes_for_link(prev_link)
+                    if b:
+                        prev_temp = parse_plugin_content(b, os.path.join("plugins", os.path.basename(prev_link)))
+                        if prev_temp:
+                            update_top_level_metadata(target_plugin, prev_temp)
 
-                    prev_temp = None
-                    if os.path.exists(prev_file_path):
-                        prev_temp = parse_plugin_file(prev_file_path)
+                    target_plugin["version"] = prev_ver
+                    target_plugin["link"] = prev_link
+                    target_plugin["size"] = prev_entry.get("size", "")
+                    
+                    if "app_version" in prev_entry:
+                        target_plugin["app_version"] = prev_entry["app_version"]
+                    elif "app_version" in target_plugin:
+                        del target_plugin["app_version"]
 
-                    if prev_temp:
-                        update_top_level_metadata(target_plugin, prev_temp)
-                    else:
-                        target_plugin["version"] = prev_ver
-                        target_plugin["link"] = prev_entry.get("link", "")
-                        target_plugin["size"] = prev_entry.get("size", "")
-                        if "app_version" in prev_entry:
-                            target_plugin["app_version"] = prev_entry["app_version"]
-                        elif "app_version" in target_plugin:
-                            del target_plugin["app_version"]
+                    if "changelog" in prev_entry:
+                        target_plugin["changelog"] = prev_entry["changelog"]
+                    elif "changelog" in target_plugin:
+                        del target_plugin["changelog"]
 
                     if del_id not in updated_ids and del_id not in deleted_ids:
                         updated_ids.append(del_id)
-            else:
+
+            elif isinstance(versions, dict) and del_ver in versions:
+                all_vers = list(versions.keys()) + [top_ver]
+                idx = all_vers.index(del_ver)
+                
+                has_prev = idx > 0
+                has_next = idx < len(all_vers) - 1
+
+                if has_next:
+                    next_ver = all_vers[idx+1]
+                    next_entry = target_plugin if next_ver == top_ver else versions[next_ver]
+
+                    if not has_prev:
+                        next_entry.pop("changelog", None)
+                    else:
+                        prev_ver = all_vers[idx-1]
+                        prev_entry = versions[prev_ver]
+
+                        prev_text = get_plugin_text(prev_entry.get("link"))
+                        next_text = get_plugin_text(next_entry.get("link"))
+                        update_changelog(next_entry, prev_text, next_text, reset_link=False)
+                
+                del versions[del_ver]
+                
                 if del_id not in updated_ids and del_id not in deleted_ids:
                     updated_ids.append(del_id)
 
@@ -357,6 +458,7 @@ def main():
             if not temp_dict:
                 continue
 
+            new_text = temp_dict.pop("_raw_text", "")
             plugin_id = temp_dict["id"]
             curr_ver = temp_dict.get("version")
 
@@ -372,14 +474,6 @@ def main():
                 has_dex = temp_dict.pop("has_dex", False)
                 temp_dict["release_date"] = temp_dict["update_date"]
                 temp_dict["versions"] = {}
-                if curr_ver:
-                    curr_entry = {
-                        "link": temp_dict["link"],
-                        "size": temp_dict["size"]
-                    }
-                    if "app_version" in temp_dict:
-                        curr_entry["app_version"] = temp_dict["app_version"]
-                    temp_dict["versions"][curr_ver] = curr_entry
 
                 temp_dict["sources"] = {
                     "clients": [
@@ -403,47 +497,61 @@ def main():
             else:
                 temp_dict.pop("has_dex", None)
                 main_plugin = plugins_list[index]
-                old_ver = main_plugin.get("version")
+                old_top_ver = main_plugin.get("version")
+                
                 if "versions" not in main_plugin or not isinstance(main_plugin["versions"], dict):
                     main_plugin["versions"] = {}
 
-                if curr_ver == old_ver:
+                if curr_ver == old_top_ver:
                     update_top_level_metadata(main_plugin, temp_dict)
-                    curr_entry = {
-                        "link": temp_dict["link"],
-                        "size": temp_dict["size"]
-                    }
-                    if "app_version" in temp_dict:
-                        curr_entry["app_version"] = temp_dict["app_version"]
-                    main_plugin["versions"][curr_ver] = curr_entry
+                    if main_plugin["versions"]:
+                        prev_ver = list(main_plugin["versions"].keys())[-1]
+                        prev_entry = main_plugin["versions"][prev_ver]
+                        old_text = get_plugin_text(prev_entry.get("link"))
+                        update_changelog(main_plugin, old_text, new_text, reset_link=False)
 
                 elif curr_ver in main_plugin["versions"]:
-                    update_top_level_metadata(main_plugin, temp_dict)
                     curr_entry = main_plugin["versions"][curr_ver]
                     curr_entry["link"] = temp_dict["link"]
                     curr_entry["size"] = temp_dict["size"]
                     if "app_version" in temp_dict:
                         curr_entry["app_version"] = temp_dict["app_version"]
-                    elif "app_version" in curr_entry:
-                        del curr_entry["app_version"]
+                    else:
+                        curr_entry.pop("app_version", None)
+
+                    all_vers = list(main_plugin["versions"].keys()) + [old_top_ver]
+                    idx = all_vers.index(curr_ver)
+
+                    if idx > 0:
+                        prev_ver = all_vers[idx-1]
+                        prev_entry = main_plugin["versions"][prev_ver]
+                        old_text = get_plugin_text(prev_entry.get("link"))
+                        update_changelog(curr_entry, old_text, new_text, reset_link=False)
+                    else:
+                        curr_entry.pop("changelog", None)
+
+                    if idx < len(all_vers) - 1:
+                        next_ver = all_vers[idx+1]
+                        next_entry = main_plugin if next_ver == old_top_ver else main_plugin["versions"][next_ver]
+                        next_text = get_plugin_text(next_entry.get("link"))
+                        update_changelog(next_entry, new_text, next_text, reset_link=False)
 
                 else:
-                    if old_ver and old_ver not in main_plugin["versions"]:
-                        ver_entry = {}
-                        for k in ["app_version", "changelog", "link", "size"]:
-                            if k in main_plugin:
-                                ver_entry[k] = main_plugin[k]
-                        main_plugin["versions"][old_ver] = ver_entry
+                    ver_entry = {
+                        "link": main_plugin.get("link", ""),
+                        "size": main_plugin.get("size", "")
+                    }
+                    if "app_version" in main_plugin:
+                        ver_entry["app_version"] = main_plugin["app_version"]
+                    if "changelog" in main_plugin:
+                        ver_entry["changelog"] = main_plugin["changelog"]
+
+                    main_plugin["versions"][old_top_ver] = ver_entry
 
                     update_top_level_metadata(main_plugin, temp_dict)
 
-                    curr_entry = {
-                        "link": temp_dict["link"],
-                        "size": temp_dict["size"]
-                    }
-                    if "app_version" in temp_dict:
-                        curr_entry["app_version"] = temp_dict["app_version"]
-                    main_plugin["versions"][curr_ver] = curr_entry
+                    old_text = get_plugin_text(ver_entry["link"])
+                    update_changelog(main_plugin, old_text, new_text, reset_link=True)
 
                 if plugin_id not in updated_ids and plugin_id not in added_ids:
                     updated_ids.append(plugin_id)
