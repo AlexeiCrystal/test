@@ -92,12 +92,12 @@
     {
       "id": "test_diff",
       "name": "Plugin Update2",
-      "version": "1.4",
+      "version": "1.2",
       "app_version": ">=1.2.3.5.678",
-      "hash": "aa264a490140442ea7aaee5fc185db7a1dba72f0186f91d38b0d3598c36ceb7e",
-      "bithash": "d038e72fa1524fc9",
-      "size": "204 B",
-      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/4.plugin",
+      "hash": "6c61dc767b3d5a3d55fe03f0f5e8fde84e00a38b1853d9aebd90461d238536d1",
+      "bithash": "afdc66589929e70d",
+      "size": "221 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/3.plugin",
       "state": "release",
       "update_date": "14.08.2026",
       "release_date": "14.08.2026",
@@ -106,16 +106,6 @@
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/2.plugin",
           "size": "173 B",
           "app_version": ">=1.2.3.5.678"
-        },
-        "1.2": {
-          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/3.plugin",
-          "size": "221 B",
-          "app_version": ">=1.2.3.5.678",
-          "changelog": [
-            "Ahahhah",
-            "+23",
-            "-1"
-          ]
         }
       },
       "sources": {
@@ -128,12 +118,12 @@
         ]
       },
       "changelog": [
-        "67",
-        "+11",
-        "-23"
+        "Ahahhah",
+        "+23",
+        "-1"
       ],
       "testfield": "123",
-      "icon": "test/1"
+      "description": "Some Description 4567"
     }
   ]
 }
