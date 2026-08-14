@@ -420,7 +420,7 @@ def main():
                         del target_plugin["app_version"]
 
                     if "changelog" in prev_entry:
-                        target_plugin["changelog"] = prev_entry["changelog"]
+                        target_plugin["changelog"] = list(prev_entry["changelog"])
                     elif "changelog" in target_plugin:
                         del target_plugin["changelog"]
 
@@ -544,7 +544,7 @@ def main():
                     if "app_version" in main_plugin:
                         ver_entry["app_version"] = main_plugin["app_version"]
                     if "changelog" in main_plugin:
-                        ver_entry["changelog"] = main_plugin["changelog"]
+                        ver_entry["changelog"] = list(main_plugin["changelog"])
 
                     main_plugin["versions"][old_top_ver] = ver_entry
 
