@@ -6,31 +6,32 @@
       "version": "1.0",
       "description": "Some Description 456",
       "app_version": ">=1.2.3.5.67",
-      "hash": "121c64b189eb6115918d38de457372b0ba8c11f352c83122a80ab53c60ca4e9a",
-      "bithash": "c29a612dc2062fa0",
-      "size": "165 B",
+      "hash": "d34f3246723ec7e2cf7d4da3faa32b363211f0c74b20729d5be21153105f8be2",
+      "bithash": "41633486529cb5ff",
+      "size": "175 B",
       "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
       "state": "beta",
       "update_date": "14.08.2026",
       "sources": {
         "clients": [
-          "exteraGram"
+          "exteraGram",
+          "AyuGram"
         ]
       },
       "release_date": "14.08.2026",
       "versions": {
         "1.0": {
           "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
-          "size": "165 B",
+          "size": "175 B",
           "app_version": ">=1.2.3.5.67"
         }
       },
-"team": [
+      "team": [
         [
           "1169951070",
           "Developer"
         ]
-]
+      ]
     }
   ]
 }
