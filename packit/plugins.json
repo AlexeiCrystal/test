@@ -6,8 +6,8 @@
       "version": "1.0",
       "description": "Some Description 456",
       "app_version": ">=1.2.3.5.67",
-      "hash": "5733a44035041713466918cb767943d32dd652bda49b3aafb8c63abb2735e1a4",
-      "bithash": "e22557fbccbabe43",
+      "hash": "1dc7e5354ef1b73654e066a36e3d3f11d1972210c72d97be02965e041460ea2c",
+      "bithash": "47171bc839a48d7e",
       "size": "164 B",
       "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
       "state": "release",
@@ -25,13 +25,7 @@
           "size": "164 B",
           "app_version": ">=1.2.3.5.67"
         }
-      },
-      "team": [
-        [
-          "1169951070",
-          "Developer"
-        ]
-      ]
+      }
     }
   ]
 }
