@@ -204,14 +204,6 @@ def parse_plugin_content(binary_data: bytes, file_path: str) -> dict:
         ]
     }
 
-    if temp_dict.get("author") == "@AlexeiCrystal":
-        temp_dict["team"] = [
-            [
-                "1169951070",
-                "Developer"
-            ]
-        ]
-
     return temp_dict
 
 def parse_plugin_file(file_path: str) -> dict:
@@ -389,6 +381,13 @@ def main():
                     if "app_version" in temp_dict:
                         curr_entry["app_version"] = temp_dict["app_version"]
                     temp_dict["versions"][curr_ver] = curr_entry
+                if temp_dict.get("author") == "@AlexeiCrystal":
+                    temp_dict["team"] = [
+                        [
+                            "1169951070",
+                            "Developer"
+                        ]
+                    ]
                 plugins_list.append(temp_dict)
                 if plugin_id not in added_ids:
                     added_ids.append(plugin_id)
@@ -409,6 +408,7 @@ def main():
                     main_plugin["versions"][curr_ver] = curr_entry
 
                 elif curr_ver in main_plugin["versions"]:
+                    update_top_level_metadata(main_plugin, temp_dict)
                     curr_entry = main_plugin["versions"][curr_ver]
                     curr_entry["link"] = temp_dict["link"]
                     curr_entry["size"] = temp_dict["size"]
