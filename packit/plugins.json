@@ -1,0 +1,30 @@
+{
+  "plugins": [
+    {
+      "id": "some_id",
+      "version": "1.0",
+      "description": "Some Description",
+      "app_version": ">=1.2.3",
+      "hash": "1349df925407a9aa68c7622f317b2e8c4e88b0b03c47e1e74449b810e738594c",
+      "bithash": "1880abb5d2ad7215",
+      "size": "133 B",
+      "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+      "state": "release",
+      "update_date": "14.08.2026",
+      "sources": {
+        "clients": [
+          "exteraGram",
+          "AyuGram"
+        ]
+      },
+      "release_date": "14.08.2026",
+      "versions": {
+        "1.0": {
+          "link": "https://github.com/AlexeiCrystal/extera-plugins/raw/main/plugins/test.plugin",
+          "size": "133 B",
+          "app_version": ">=1.2.3"
+        }
+      }
+    }
+  ]
+}
